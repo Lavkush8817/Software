@@ -1,0 +1,63 @@
+[
+  {
+    "id": 1,
+    "email": "admin@campus.edu",
+    "password": "admin123",
+    "role": "admin",
+    "created_at": "2025-11-02T14:11:05.764884"
+  },
+  {
+    "id": 2,
+    "email": "techcorp@example.com",
+    "password": "company123",
+    "role": "company",
+    "company_name": "Tech Corp",
+    "company_description": "Leading technology company",
+    "verified": true,
+    "created_at": "2025-11-02T14:11:05.765057"
+  },
+  {
+    "id": 3,
+    "email": "student@campus.edu",
+    "password": "student123",
+    "role": "student",
+    "name": "John Doe",
+    "college": "Campus University",
+    "graduation_year": "2024",
+    "created_at": "2025-11-02T14:11:05.765060"
+  },
+  {
+    "id": 4,
+    "email": "dubeylavkush222@gmail.com",
+    "role": "company",
+    "created_at": "2025-11-02T14:14:52.950992",
+    "company_name": "Lugstore",
+    "company_description": "just for fun\n",
+    "verified": true
+  },
+  {
+    "id": 5,
+    "email": "dubeylavkush22@gmail.com",
+    "role": "company",
+    "created_at": "2025-11-02T14:16:27.882237",
+    "company_name": "llll",
+    "company_description": "kkk",
+    "verified": true
+  },
+  {
+    "id": 6,
+    "email": "Lav12@gmail.com",
+    "password": "Lav@123",
+    "role": "student",
+    "created_at": "2025-11-02T14:17:56.549034",
+    "name": "Lav",
+    "college": "DPU",
+    "graduation_year": "2nd"
+  },
+  {
+    "id": 7,
+    "email": "lavkush11@gmail.com",
+    "role": "admin",
+    "created_at": "2025-11-02T15:30:29.203878"
+  }
+]

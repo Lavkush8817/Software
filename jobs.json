@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1,
+    "company_id": 2,
+    "company_name": "Tech Corp",
+    "title": "Software engineer",
+    "type": "fulltime",
+    "description": "Designs, develops, tests, and maintains software applications and systems.\nCollaborates with cross-functional teams to understand user needs and technical requirements.\nWrites clean, efficient, and scalable code using programming languages like Java, Python, or C++.\nTroubleshoots and debugs software issues to ensure optimal performance.\nContinuously updates skills to keep up with evolving technologies and industry trends.",
+    "requirements": "Educational Qualifications\n\nBachelor's degree in Computer Science, Software Engineering, or related field.\n\nSome roles may accept equivalent experience or certifications.\n\n\ud83d\udcbb Technical Skills\n\nProficiency in programming languages like Python, Java, C++, or JavaScript.\n\nKnowledge of data structures, algorithms, and software development methodologies.\n\nExperience with databases, version control (e.g., Git), and debugging tools.\n\n\ud83d\udee0\ufe0f Soft Skills\n\nStrong problem-solving and analytical thinking.\n\nGood communication and teamwork abilities.\n\nAdaptability and willingness to learn new technologies.\n\n\ud83d\udcc1 Experience & Certifications (Optional but Valuable)\nInternships, personal projects, or contributions to open-source.\nCertifications like AWS, Microsoft Azure, or Google Cloud for cloud roles.\nWould you like a checklist format or tailored requirements for a specific type of software engineering role (e.g., front-end, back-end, full-stack)?",
+    "location": "Pune",
+    "deadline": "10/12/2025",
+    "status": "approved",
+    "created_at": "2025-11-02T14:26:53.025345"
+  },
+  {
+    "id": 2,
+    "company_id": 2,
+    "company_name": "Tech Corp",
+    "title": "Software engineering",
+    "type": "fulltime",
+    "description": "For full-time work in Pune.",
+    "requirements": "I need full stack developer.\nWith react and node JS",
+    "location": "pune",
+    "deadline": "2025 / 12 / 30",
+    "status": "pending",
+    "created_at": "2025-11-02T14:29:32.896311"
+  },
+  {
+    "id": 3,
+    "company_id": 2,
+    "company_name": "Tech Corp",
+    "title": "web develpper",
+    "type": "parttime",
+    "description": "need web devlpoers",
+    "requirements": "abcd",
+    "location": "pune",
+    "deadline": "12/25/2025",
+    "status": "approved",
+    "created_at": "2025-11-02T16:00:52.662319"
+  }
+]
