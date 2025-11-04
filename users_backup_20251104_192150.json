@@ -33,8 +33,7 @@
     "created_at": "2025-11-02T14:14:52.950992",
     "company_name": "Lugstore",
     "company_description": "just for fun\n",
-    "verified": true,
-    "password": "temp123"
+    "verified": true
   },
   {
     "id": 5,
@@ -43,8 +42,7 @@
     "created_at": "2025-11-02T14:16:27.882237",
     "company_name": "llll",
     "company_description": "kkk",
-    "verified": true,
-    "password": "temp123"
+    "verified": true
   },
   {
     "id": 6,
@@ -60,7 +58,6 @@
     "id": 7,
     "email": "lavkush11@gmail.com",
     "role": "admin",
-    "created_at": "2025-11-02T15:30:29.203878",
-    "password": "temp123"
+    "created_at": "2025-11-02T15:30:29.203878"
   }
 ]

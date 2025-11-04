@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "job_id": 2,
+    "student_id": 6,
+    "student_name": "Lav",
+    "status": "approved",
+    "cover_letter": "I am interested ",
+    "applied_at": "2025-11-02T14:33:12.017427",
+    "job": {
+      "id": 2,
+      "company_id": 2,
+      "company_name": "Tech Corp",
+      "title": "Software engineering",
+      "type": "fulltime",
+      "description": "For full-time work in Pune.",
+      "requirements": "I need full stack developer.\nWith react and node JS",
+      "location": "pune",
+      "deadline": "2025 / 12 / 30",
+      "status": "pending",
+      "created_at": "2025-11-02T14:29:32.896311"
+    }
+  }
+]

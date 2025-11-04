@@ -29,17 +29,21 @@ def get_current_user():
 def register():
     """Register a new user"""
     data = request.json
+    print(f"🔍 REGISTER DEBUG: Received data: {data}")
     
     # Validate required fields
     if not data.get('email') or not data.get('password') or not data.get('role'):
+        print(f"❌ REGISTER ERROR: Missing required fields - email: {data.get('email')}, password: {'***' if data.get('password') else None}, role: {data.get('role')}")
         return jsonify({'error': 'Missing required fields'}), 400
     
     # Check if user already exists
-    if any(user['email'] == data['email'] for user in job_board.users):
+    existing_user = next((user for user in job_board.users if user['email'] == data['email']), None)
+    if existing_user:
+        print(f"❌ REGISTER ERROR: User already exists with email: {data['email']}")
         return jsonify({'error': 'User with this email already exists'}), 400
     
     user_data = {
-        'id': len(job_board.users) + 1,
+        'id': job_board.get_next_user_id(),
         'email': data['email'],
         'password': data['password'],  # In real app, hash this!
         'role': data['role'],
@@ -56,12 +60,24 @@ def register():
         user_data['company_description'] = data.get('company_description', '')
         user_data['verified'] = False
     
-    job_board.users.append(user_data)
-    job_board.save_data()
+    print(f"✅ REGISTER DEBUG: Creating user with ID {user_data['id']} and email {user_data['email']}")
+    print(f"🔐 REGISTER DEBUG: Password field present: {'password' in user_data}")
+    
+    # Add user and save
+    job_board.add_user(user_data)
+    
+    # Verify user was saved by reloading data
+    job_board.users = job_board._load_json(job_board.users_file, [])
+    saved_user = next((user for user in job_board.users if user['email'] == data['email']), None)
+    if saved_user:
+        print(f"✅ REGISTER SUCCESS: User saved successfully. Password field in saved data: {'password' in saved_user}")
+    else:
+        print(f"❌ REGISTER ERROR: User not found after saving!")
     
     # Remove password from response
-    user_data.pop('password', None)
-    return jsonify({'message': 'Registration successful', 'user': user_data}), 201
+    response_user = user_data.copy()
+    response_user.pop('password', None)
+    return jsonify({'message': 'Registration successful', 'user': response_user}), 201
 
 @app.route('/api/login', methods=['POST'])
 def login():
@@ -70,21 +86,53 @@ def login():
     email = data.get('email')
     password = data.get('password')
     
-    for user in job_board.users:
-        if user['email'] == email and user['password'] == password:
-            # Create session (in production, use JWT)
-            session_id = f"session_{user['id']}_{datetime.datetime.now().timestamp()}"
-            sessions[session_id] = user['id']
-            
-            # Remove password from response
-            user_response = {k: v for k, v in user.items() if k != 'password'}
-            return jsonify({
-                'message': 'Login successful',
-                'user': user_response,
-                'session_id': session_id
-            }), 200
+    print(f"🔍 LOGIN DEBUG: Attempting login for email: {email}")
+    print(f"🔍 LOGIN DEBUG: Total users in memory: {len(job_board.users)}")
     
-    return jsonify({'error': 'Invalid email or password'}), 401
+    # Reload users from file to ensure we have latest data
+    job_board.users = job_board._load_json(job_board.users_file, [])
+    print(f"🔄 LOGIN DEBUG: Reloaded {len(job_board.users)} users from file")
+    
+    # Debug: Show all users (without passwords)
+    for i, user in enumerate(job_board.users):
+        has_password = 'password' in user and user['password'] is not None
+        print(f"👤 LOGIN DEBUG: User {i+1}: {user['email']} (ID: {user['id']}, Role: {user['role']}, Has Password: {has_password})")
+    
+    # Find user by email
+    target_user = None
+    for user in job_board.users:
+        if user['email'] == email:
+            target_user = user
+            break
+    
+    if not target_user:
+        print(f"❌ LOGIN ERROR: No user found with email: {email}")
+        return jsonify({'error': 'Invalid email or password'}), 401
+    
+    print(f"✅ LOGIN DEBUG: Found user with email: {email}")
+    print(f"🔐 LOGIN DEBUG: User has password field: {'password' in target_user}")
+    
+    if 'password' not in target_user:
+        print(f"❌ LOGIN ERROR: User {email} has no password field in database!")
+        return jsonify({'error': 'Account data corrupted. Please contact admin.'}), 500
+    
+    if target_user['password'] != password:
+        print(f"❌ LOGIN ERROR: Password mismatch for user: {email}")
+        return jsonify({'error': 'Invalid email or password'}), 401
+    
+    print(f"✅ LOGIN SUCCESS: Authentication successful for user: {email}")
+    
+    # Create session (in production, use JWT)
+    session_id = f"session_{target_user['id']}_{datetime.datetime.now().timestamp()}"
+    sessions[session_id] = target_user['id']
+    
+    # Remove password from response
+    user_response = {k: v for k, v in target_user.items() if k != 'password'}
+    return jsonify({
+        'message': 'Login successful',
+        'user': user_response,
+        'session_id': session_id
+    }), 200
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
@@ -103,6 +151,31 @@ def get_current_user_info():
     
     user_response = {k: v for k, v in user.items() if k != 'password'}
     return jsonify(user_response), 200
+
+@app.route('/api/debug/users', methods=['GET'])
+def debug_users():
+    """Debug endpoint to check user data (remove in production)"""
+    # Only allow in development or for admin users
+    user = get_current_user()
+    if not user or user['role'] != UserRole.ADMIN.value:
+        return jsonify({'error': 'Access denied'}), 403
+    
+    debug_info = {
+        'total_users': len(job_board.users),
+        'users_summary': []
+    }
+    
+    for user in job_board.users:
+        user_info = {
+            'id': user['id'],
+            'email': user['email'],
+            'role': user['role'],
+            'has_password': 'password' in user and user['password'] is not None,
+            'created_at': user.get('created_at', 'Unknown')
+        }
+        debug_info['users_summary'].append(user_info)
+    
+    return jsonify(debug_info), 200
 
 # Job endpoints
 @app.route('/api/jobs', methods=['GET'])
@@ -124,7 +197,7 @@ def create_job():
     data = request.json
     
     job_data = {
-        'id': len(job_board.jobs) + 1,
+        'id': job_board.get_next_job_id(),
         'company_id': user['id'],
         'company_name': user['company_name'],
         'title': data.get('title'),
@@ -137,8 +210,7 @@ def create_job():
         'created_at': datetime.datetime.now().isoformat()
     }
     
-    job_board.jobs.append(job_data)
-    job_board.save_data()
+    job_board.add_job(job_data)
     
     return jsonify({'message': 'Job posted successfully', 'job': job_data}), 201
 
@@ -186,7 +258,7 @@ def create_application():
         return jsonify({'error': 'You have already applied for this job'}), 400
     
     application = {
-        'id': len(job_board.applications) + 1,
+        'id': job_board.get_next_application_id(),
         'job_id': job_id,
         'student_id': user['id'],
         'student_name': user['name'],
@@ -195,8 +267,7 @@ def create_application():
         'applied_at': datetime.datetime.now().isoformat()
     }
     
-    job_board.applications.append(application)
-    job_board.save_data()
+    job_board.add_application(application)
     
     return jsonify({'message': 'Application submitted successfully', 'application': application}), 201
 
@@ -245,8 +316,7 @@ def update_application_status(app_id):
     if not job or job['company_id'] != user['id']:
         return jsonify({'error': 'Access denied'}), 403
     
-    application['status'] = status
-    job_board.save_data()
+    job_board.update_application(app_id, {'status': status})
     
     return jsonify({'message': 'Application status updated', 'application': application}), 200
 
@@ -275,8 +345,7 @@ def verify_company(company_id):
     if not company or company['role'] != UserRole.COMPANY.value:
         return jsonify({'error': 'Company not found'}), 404
     
-    company['verified'] = True
-    job_board.save_data()
+    job_board.update_user(company_id, {'verified': True})
     
     company.pop('password', None)
     return jsonify({'message': 'Company verified', 'company': company}), 200
@@ -310,7 +379,7 @@ def approve_job(job_id):
     else:
         return jsonify({'error': 'Invalid action'}), 400
     
-    job_board.save_data()
+    job_board.update_job(job_id, {'status': job['status']})
     return jsonify({'message': 'Job status updated', 'job': job}), 200
 
 @app.route('/api/admin/applications', methods=['GET'])
